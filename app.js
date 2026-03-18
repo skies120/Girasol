@@ -16,26 +16,28 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   strokeWeight(0.7);
 
-  // 🔥 MENOS puntos (antes 1000)
+  // menos carga para móvil
   const numFocalPoints = 120;
 
   for (let i = 0; i < numFocalPoints; i++) {
     fArray.push(createVector(random(width), random(height)));
   }
 
-  frameRate(30); // 🔥 clave para móvil
+  frameRate(30);
 }
 
-let hatchDelay = 2; // menos carga
+let hatchDelay = 2;
 
 function draw() {
   if (!hatchToggle) return;
 
-  // 🔥 brillo más liviano (no toca todos los píxeles)
+  // 🔥 DIBUJAR IMAGEN BASE
+  image(bg, 0, 0, width, height);
+
+  // brillo dinámico liviano
   applyOverlayBrightness();
 
   if (frameCount % hatchDelay === 0) {
-    // 🔥 menos iteraciones (antes 10)
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < fArray.length; j++) {
         circleHatch(fArray[j].x, fArray[j].y);
@@ -68,7 +70,7 @@ function circleHatch(cx, cy) {
   chatchSize = min(chatchSize + 0.03, 200);
 }
 
-// 🔥 NUEVO: brillo eficiente (overlay en vez de píxeles)
+// brillo eficiente con overlay
 function applyOverlayBrightness() {
   brightnessLevel += brightnessDirection * 0.5;
 
@@ -78,16 +80,13 @@ function applyOverlayBrightness() {
 
   noStroke();
 
-  // noche → overlay oscuro
   if (brightnessLevel < 0) {
     fill(0, abs(brightnessLevel) * 2);
-    rect(0, 0, width, height);
-  } 
-  // día → overlay cálido
-  else {
+  } else {
     fill(255, 200, 50, brightnessLevel * 0.5);
-    rect(0, 0, width, height);
   }
+
+  rect(0, 0, width, height);
 }
 
 // interacción
@@ -105,6 +104,7 @@ function keyPressed() {
   hatchToggle = !hatchToggle;
 }
 
+// responsive
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
