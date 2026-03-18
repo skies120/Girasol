@@ -6,7 +6,7 @@ let cx, cy;
 let chatchSize = 100;
 let bg;
 
-// 🔥 variables para brillo dinámico
+// brillo dinámico
 let brightnessLevel = 0;
 let brightnessDirection = 1;
 
@@ -17,9 +17,10 @@ function preload() {
 }
 
 function setup() {
-  h = max(windowWidth, 3*windowHeight);
-  w = (h * bg.width) / bg.height;
+  h = windowHeight;
+  w = windowWidth;
   cnv = createCanvas(w, h);
+
   strokeWeight(0.8);
 
   const numFocalPoints = 1000;
@@ -37,7 +38,7 @@ let hatchDelay = 1;
 function draw() {
   if (hatchToggle) {
 
-    // 🔥 SOLO agregamos esto (brillo dinámico)
+    // brillo dinámico
     brightenImage();
 
     if (frameCount % hatchDelay === 0) {
@@ -55,16 +56,20 @@ function draw() {
 }
 
 function circleHatch(cx, cy) {
-  x = random(0, width);
-  y = random(0, height);
+  let x = random(0, width);
+  let y = random(0, height);
 
-  pixCol = bg.get(bg.width / (width / x), bg.height / (height / y));
+  // 🔥 FIX CRÍTICO (evita NaN)
+  let imgX = floor(map(x, 0, width, 0, bg.width));
+  let imgY = floor(map(y, 0, height, 0, bg.height));
+
+  let pixCol = bg.get(imgX, imgY);
   stroke(pixCol);
 
-  r = dist(cx, cy, x, y);
-  theta = atan((y - cy) / (x - cx));
-  hs = min(200, chatchSize / 10);
-  d = random(PI / (hs + 10), PI / hs);
+  let r = dist(cx, cy, x, y);
+  let theta = atan((y - cy) / (x - cx));
+  let hs = min(200, chatchSize / 10);
+  let d = random(PI / (hs + 10), PI / hs);
 
   noFill();
 
@@ -86,7 +91,7 @@ function circleHatch(cx, cy) {
   chatchSize += 0.05;
 }
 
-// change the focal points
+// cambiar focal points
 function mousePressed() {
   fArray = [];
   const numFocalPoints = 20;
@@ -106,17 +111,20 @@ function keyPressed() {
 }
 
 function classicHatch() {
-  x = random(0, width);
-  y = random(0, height);
+  let x = random(0, width);
+  let y = random(0, height);
 
-  pixCol = bg.get(bg.width / (width / x), bg.height / (height / y));
+  let imgX = floor(map(x, 0, width, 0, bg.width));
+  let imgY = floor(map(y, 0, height, 0, bg.height));
+
+  let pixCol = bg.get(imgX, imgY);
   stroke(pixCol);
 
-  d = random(0, hatchSize);
+  let d = random(0, hatchSize);
   line(x - d / 2, y - d / 2, x + d / 22, y + d / 2);
 }
 
-// 🔥 FUNCIÓN DINÁMICA (REEMPLAZA LA ORIGINAL)
+// 🔥 brillo dinámico correcto
 function brightenImage() {
   bg.loadPixels();
 
