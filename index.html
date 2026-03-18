@@ -29,69 +29,105 @@ canvas {
   transform: translate(-50%, -50%) scale(0.8);
 }
 
-/* ROSA COMPLEJA */
-.container .glass {
+/* CÚPULA */
+.glass {
   height: 300px;
   width: 180px;
   border: 2px solid rgba(255,255,255,0.5);
   border-radius: 100px 100px 0 0;
   position: relative;
-  margin: auto;
 }
 
-.container .glow {
+/* BRILLO */
+.glow {
   position: absolute;
   width: 120px;
   height: 120px;
   border-radius: 50%;
   left: 50%;
-  top: 20px;
+  top: 30px;
   transform: translateX(-50%);
-  box-shadow: 0 0 30px #f594b8;
+  box-shadow: 0 0 30px #ffd54f;
   animation: glowing 3s infinite;
 }
 
 /* TALLO */
 .stem {
-  width: 4px;
-  height: 120px;
-  background: green;
+  width: 5px;
+  height: 130px;
+  background: #2e7d32;
   position: absolute;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
 }
 
-/* PÉTALOS CENTRO */
-.rose {
+/* GIRASOL */
+.sunflower {
   position: absolute;
-  top: 80px;
+  top: 70px;
   left: 50%;
   transform: translateX(-50%);
 }
 
-.petal {
-  width: 30px;
+/* CENTRO */
+.center {
+  width: 40px;
   height: 40px;
-  background: crimson;
-  position: absolute;
+  background: #4e342e;
   border-radius: 50%;
-  animation: float 4s ease-in-out infinite;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
 }
 
-.p1 { transform: rotate(0deg); }
-.p2 { transform: rotate(60deg); }
-.p3 { transform: rotate(120deg); }
+/* PÉTALOS */
+.petal {
+  width: 18px;
+  height: 50px;
+  background: linear-gradient(#ffd54f, #fbc02d);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: bottom center;
+  border-radius: 50%;
+  animation: sway 4s ease-in-out infinite;
+}
+
+/* GENERAR MUCHOS PÉTALOS */
+.petal:nth-child(1)  { transform: translate(-50%, -100%) rotate(0deg); }
+.petal:nth-child(2)  { transform: translate(-50%, -100%) rotate(30deg); }
+.petal:nth-child(3)  { transform: translate(-50%, -100%) rotate(60deg); }
+.petal:nth-child(4)  { transform: translate(-50%, -100%) rotate(90deg); }
+.petal:nth-child(5)  { transform: translate(-50%, -100%) rotate(120deg); }
+.petal:nth-child(6)  { transform: translate(-50%, -100%) rotate(150deg); }
+.petal:nth-child(7)  { transform: translate(-50%, -100%) rotate(180deg); }
+.petal:nth-child(8)  { transform: translate(-50%, -100%) rotate(210deg); }
+.petal:nth-child(9)  { transform: translate(-50%, -100%) rotate(240deg); }
+.petal:nth-child(10) { transform: translate(-50%, -100%) rotate(270deg); }
+.petal:nth-child(11) { transform: translate(-50%, -100%) rotate(300deg); }
+.petal:nth-child(12) { transform: translate(-50%, -100%) rotate(330deg); }
 
 /* HOJA */
-.fallen {
-  width: 30px;
+.leaf {
+  width: 40px;
   height: 20px;
-  background: crimson;
+  background: #388e3c;
   border-radius: 50%;
   position: absolute;
-  bottom: 10px;
-  left: 60px;
+  bottom: 80px;
+}
+
+.leaf.left {
+  left: 20px;
+  transform: rotate(-30deg);
+}
+
+.leaf.right {
+  right: 20px;
+  transform: rotate(30deg);
 }
 
 /* BASE */
@@ -115,11 +151,11 @@ canvas {
 
 /* ANIMACIONES */
 @keyframes glowing {
-  50% { box-shadow: 0 0 60px #f594b8; }
+  50% { box-shadow: 0 0 60px #ffd54f; }
 }
 
-@keyframes float {
-  50% { transform: translateY(-5px) rotate(10deg); }
+@keyframes sway {
+  50% { transform: translate(-50%, -100%) rotate(var(--r)) scale(1.05); }
 }
 
 @keyframes fadeIn {
@@ -143,14 +179,29 @@ canvas {
   <div class="glass">
     <div class="glow"></div>
 
-    <div class="rose">
-      <div class="petal p1"></div>
-      <div class="petal p2"></div>
-      <div class="petal p3"></div>
+    <div class="sunflower">
+      <!-- pétalos -->
+      <div class="petal" style="--r:0deg"></div>
+      <div class="petal" style="--r:30deg"></div>
+      <div class="petal" style="--r:60deg"></div>
+      <div class="petal" style="--r:90deg"></div>
+      <div class="petal" style="--r:120deg"></div>
+      <div class="petal" style="--r:150deg"></div>
+      <div class="petal" style="--r:180deg"></div>
+      <div class="petal" style="--r:210deg"></div>
+      <div class="petal" style="--r:240deg"></div>
+      <div class="petal" style="--r:270deg"></div>
+      <div class="petal" style="--r:300deg"></div>
+      <div class="petal" style="--r:330deg"></div>
+
+      <!-- centro -->
+      <div class="center"></div>
     </div>
 
     <div class="stem"></div>
-    <div class="fallen"></div>
+    <div class="leaf left"></div>
+    <div class="leaf right"></div>
+
   </div>
   <div class="base"></div>
 </div>
@@ -178,9 +229,9 @@ function move(e){
 window.addEventListener('mousemove', move);
 window.addEventListener('touchmove', move);
 
-/* pétalos optimizados */
+/* pétalos flotando */
 const petals = [];
-const TOTAL = 30; // reducido para móvil
+const TOTAL = 30;
 
 class Petal {
   constructor(){ this.reset(); }
@@ -199,7 +250,7 @@ class Petal {
     ctx.translate(this.x,this.y);
     ctx.rotate(this.angle);
 
-    ctx.fillStyle = "#ff4e85";
+    ctx.fillStyle = "#ffd54f";
     ctx.beginPath();
     ctx.ellipse(0,0,this.size,this.size/2,0,0,Math.PI*2);
     ctx.fill();
@@ -219,7 +270,6 @@ class Petal {
 
 for(let i=0;i<TOTAL;i++) petals.push(new Petal());
 
-/* animación */
 function animate(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   petals.forEach(p=>p.update());
