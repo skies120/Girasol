@@ -1,18 +1,255 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Sunflowers</title>
-  <link rel="stylesheet" href="./style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pequeños Detalles 🌻</title>
 
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: sans-serif;
+  transition: background 2s;
+}
+
+/* FONDO DINÁMICO */
+body.day {
+  background: linear-gradient(#87ceeb, #fdd835);
+}
+body.night {
+  background: linear-gradient(#0f2027, #203a43, #2c5364);
+}
+
+/* CANVAS */
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+/* GIRASOL */
+.container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.7);
+  z-index: 2;
+}
+
+/* CENTRO */
+.center {
+  width: 90px;
+  height: 90px;
+  background: radial-gradient(circle, #4e342e, #3e2723);
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+}
+
+/* PÉTALOS GIRASOL */
+.petals div {
+  width: 22px;
+  height: 70px;
+  background: linear-gradient(#ffeb3b, #fbc02d);
+  position: absolute;
+  left: 50%;
+  transform-origin: bottom center;
+  border-radius: 50%;
+  opacity: 0;
+  animation: bloom 2s forwards ease-out;
+}
+
+.petals div {
+  transform: rotate(calc(30deg * var(--i))) translateX(-50%);
+  animation-delay: calc(0.1s * var(--i));
+}
+
+/* TALLO */
+.stem {
+  width: 10px;
+  height: 230px;
+  background: linear-gradient(#2e7d32, #1b5e20);
+  margin: auto;
+}
+
+/* HOJAS */
+.leaf {
+  width: 60px;
+  height: 30px;
+  background: #388e3c;
+  border-radius: 50%;
+  position: absolute;
+}
+.leaf.left { top: 150px; left: -50px; }
+.leaf.right { top: 190px; right: -50px; }
+
+/* MENSAJE */
+.message {
+  position: absolute;
+  bottom: 10%;
+  width: 100%;
+  text-align: center;
+  font-size: 24px;
+  color: white;
+  opacity: 0;
+  animation: fadeIn 3s forwards 3s;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* BRILLO */
+.glow {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 40px rgba(255, 235, 59, 0.6);
+  animation: pulse 3s infinite;
+}
+
+@keyframes pulse {
+  50% { box-shadow: 0 0 80px rgba(255, 235, 59, 0.9); }
+}
+
+@keyframes bloom {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1) rotate(calc(30deg * var(--i))); opacity: 1; }
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .container { transform: translate(-50%, -50%) scale(0.5); }
+  .message { font-size: 18px; }
+}
+</style>
 </head>
-<body>
-  
 
-<!-- partial:index.partial.html -->
- 
-<!-- partial -->
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js'></script><script  src="app.js"></script>
+<body class="day">
+
+<canvas></canvas>
+
+<div class="container">
+  <div class="glow"></div>
+  <div class="center"></div>
+
+  <div class="petals">
+    <div style="--i:0"></div><div style="--i:1"></div>
+    <div style="--i:2"></div><div style="--i:3"></div>
+    <div style="--i:4"></div><div style="--i:5"></div>
+    <div style="--i:6"></div><div style="--i:7"></div>
+    <div style="--i:8"></div><div style="--i:9"></div>
+    <div style="--i:10"></div><div style="--i:11"></div>
+  </div>
+
+  <div class="stem"></div>
+  <div class="leaf left"></div>
+  <div class="leaf right"></div>
+</div>
+
+<div class="message">pequeños detalles ✨</div>
+
+<!-- AUDIO -->
+<audio id="music" loop>
+  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_c8c8a73467.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const canvas = document.querySelector('canvas');
+const ctx = canvas.getContext('2d');
+const music = document.getElementById('music');
+
+/* resize */
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+/* día/noche automático */
+setInterval(() => {
+  document.body.classList.toggle('day');
+  document.body.classList.toggle('night');
+}, 8000);
+
+/* interacción */
+let wind = 0;
+
+function move(e) {
+  const x = e.touches ? e.touches[0].clientX : e.clientX;
+  wind = (x / window.innerWidth - 0.5) * 2;
+}
+
+window.addEventListener('mousemove', move);
+window.addEventListener('touchmove', move);
+
+/* activar música al tocar */
+window.addEventListener('click', () => {
+  music.play().catch(()=>{});
+});
+
+/* pétalos */
+const petals = [];
+const TOTAL = 60;
+
+class Petal {
+  constructor() { this.reset(); }
+
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * -canvas.height;
+    this.size = 6 + Math.random() * 10;
+    this.speedY = 1 + Math.random();
+    this.speedX = Math.random();
+    this.angle = Math.random() * Math.PI;
+  }
+
+  draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.angle);
+
+    let g = ctx.createLinearGradient(0,0,this.size,this.size);
+    g.addColorStop(0,"#ff9ecb");
+    g.addColorStop(1,"#ff4d88");
+
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.ellipse(0,0,this.size,this.size/2,0,0,Math.PI*2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  update() {
+    this.y += this.speedY;
+    this.x += this.speedX + wind * 2;
+    this.angle += 0.03;
+
+    if (this.y > canvas.height) this.reset();
+    this.draw();
+  }
+}
+
+for (let i = 0; i < TOTAL; i++) petals.push(new Petal());
+
+function animate() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  petals.forEach(p=>p.update());
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
 
 </body>
 </html>
